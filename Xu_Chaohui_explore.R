@@ -28,9 +28,9 @@ explore <- function(data, plotswitch = "off", threshold = 0, bins = NULL) {
   
   plot_gray (data, plotswitch) #plot gray bar graph for every categorical and binary variable.
   
-  new_result=list(result1, result2, result3, result4) 
+  main = list(result1, result2, result3, result4) #construct a new list for the result from all sub-functions
   
-  return (new_result)
+  return (main) 
   
 }
 
@@ -134,8 +134,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   plots <- c(list(...), plotlist)
   numPlots = length(plots)
   if (is.null(layout)) { #if layout is null
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)), ncol = cols, nrow = ceiling(numPlots/cols))
   }
   
   if (numPlots==1) {
@@ -170,17 +169,17 @@ plot_density_count <- function(data,plotswitch='off',vector=NULL){
       for(j in 1:length(vector)) { #for loop
         for(i in 1:ncol(num)) {
           mean <- mean(num[,i]) #obtain the mean of each column
-          p1 <- ggplot(num,aes(x=num[i]),color = "blue") #plot the histogram of counts
-            geom_histogram(fill="blue",bins=vector[j])
-            ggtitle(paste(colnames(num[i]),vector[j],sep=" bins="))
-            xlab(colnames(num[i]))
+          p1 <- ggplot(num,aes(x=num[i]),color = "blue")+ #plot the histogram of counts
+            geom_histogram(fill="blue",bins=vector[j])+
+            ggtitle(paste(colnames(num[i]),vector[j],sep=" bins="))+
+            xlab(colnames(num[i]))+
             geom_vline(xintercept = mean,col="red")  #add red line at the mean
         
           
-          p2 <- ggplot(num,aes(x=num[i],..density..)) #plot the histogram of density
-            geom_histogram(fill="blue",bins=vector[j])
-            ggtitle(paste(colnames(num[i]),vector[j],sep=" bins="))
-            xlab(colnames(num[i]))
+          p2 <- ggplot(num,aes(x=num[i],..density..))+ 
+            geom_histogram(fill="blue",bins=vector[j])+  #plot the histogram of density
+            ggtitle(paste(colnames(num[i]),vector[j],sep=" bins="))+
+            xlab(colnames(num[i]))+ 
             geom_vline(xintercept = mean,col="red") 
           
           grid.newpage()
@@ -195,16 +194,16 @@ plot_density_count <- function(data,plotswitch='off',vector=NULL){
     }else{ #if vector isn't NULL
       for(i in 1:ncol(num)) {
         mean <- mean(num[,i]) #obtain the mean of each numeric column
-        p1 <- ggplot(num,aes(x=num[i]),color = "blue")  
-          geom_histogram(fill="blue") #plot the histogram of counts
-          ggtitle(paste(colnames(num[i]),"default bins",sep=" bins="))
-          xlab(colnames(num[i]))
-          geom_vline(xintercept = mean,col="red")
-        p2 <- ggplot(num,aes(x=num[i],..density..)) #plot the histogram of density
-          geom_histogram(fill="blue")
-          ggtitle(paste(colnames(num[i]),"default bins",sep=" bins="))
-          xlab(colnames(num[i]))
-          geom_vline(xintercept = mean,col="red")
+        p1 <- ggplot(num,aes(x=num[i]),color = "blue") + 
+          geom_histogram(fill="blue") + #plot the histogram of counts
+          ggtitle(paste(colnames(num[i]),"default bins",sep=" bins=") )+
+          xlab(colnames(num[i])) +
+          geom_vline(xintercept = mean,col="red") #vertical red line at mean
+        p2 <- ggplot(num,aes(x=num[i],..density..)) + #plot the histogram of density
+          geom_histogram(fill="blue") +
+          ggtitle(paste(colnames(num[i]),"default bins",sep=" bins=")) +
+          xlab(colnames(num[i])) +
+          geom_vline(xintercept = mean,col="red") #vertical red line at mean
         grid.newpage()
         pushViewport(viewport(layout = grid.layout(2, 2, heights = unit(c(1, 8), "null"))))
         title <- paste(colnames(num[i]),"default bins",sep=" bins=")
@@ -223,15 +222,11 @@ plot_density_count <- function(data,plotswitch='off',vector=NULL){
         his_count <-list()   #create an empty list
         his_density <- list()   #create an empty list
         for(i in 1:ncol(num)){
-          his_count[[i]] <- ggplot(num, aes_string(colnames(num[i])), color = "blue")  
-            geom_histogram(fill="blue", bins = vector[j]) 
-            labs(title= paste(vector[j], "bins")) #plot histograms of counts and store the graphs in his_count
+          his_count[[i]] <- ggplot(num, aes_string(colnames(num[i])), color = "blue") + geom_histogram(fill="blue", bins = vector[j]) + labs(title= paste(vector[j], "bins")) #plot histograms of counts and store the graphs in his_count
         }
         multiplot(plotlist = his_count, cols = 2)  
         for(i in 1:ncol(num)) {
-          his_density[[i]] <- ggplot(num, aes_string(colnames(num[i])), color = "blue")  
-            geom_histogram(aes(y= ..density..), fill="blue", bins = vector[j])
-            labs(title= paste(vector[j], "bins")) 
+          his_density[[i]] <- ggplot(num, aes_string(colnames(num[i])), color = "blue")+geom_histogram(aes(y= ..density..), fill="blue", bins = vector[j])+labs(title= paste(vector[j], "bins")) 
           #plot histograms of density and store them in his_density 
         }
         multiplot(plotlist = his_density, cols = 2)   
@@ -261,8 +256,7 @@ plot_gray <- function(data, plotswitch='off') {
   dfm_cb <- data[,sapply(data,is.factor)|sapply(data,is.logical)|sapply(data,is.binary)] #get the categorical and logical columns
   if(plotswitch=="on"|plotswitch=="grid") {
     for(i in 1:ncol(dfm_cb)){
-      p <- ggplot(dfm_cb,aes(x=dfm_cb[,i]),colour="gray")
-        geom_bar()+ xlab(colnames(dfm_cb[i])) #plot gray bar for every categorial and binary variable
+      p <- ggplot(dfm_cb,aes(x=dfm_cb[,i]),colour="gray") + geom_bar() + xlab(colnames(dfm_cb[i])) #plot gray bar for every categorial and binary variable
       print(p)
     }
   }
